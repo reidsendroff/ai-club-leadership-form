@@ -130,8 +130,19 @@ function updateOtherToolsField() {
 }
 
 function setStatus(message, type = '') {
-  statusEl.textContent = message;
   statusEl.className = type;
+  statusEl.replaceChildren();
+  if (Array.isArray(message)) {
+    const list = document.createElement('ul');
+    message.forEach((item) => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      list.append(li);
+    });
+    statusEl.append(list);
+    return;
+  }
+  statusEl.textContent = message;
 }
 
 function requireAllChecked(name, expectedCount, message, sectionId) {
@@ -209,8 +220,11 @@ form.addEventListener('submit', async (event) => {
 
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const detail = payload.issues?.map((issue) => `${issue.path}: ${issue.message}`).join('; ');
-      throw new Error(detail || payload.error || 'Submission failed.');
+      if (payload.issues?.length) {
+        setStatus(payload.issues.map((issue) => `${issue.path}: ${issue.message}`), 'error');
+        return;
+      }
+      throw new Error(payload.error || 'Submission failed.');
     }
 
     form.reset();

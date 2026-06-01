@@ -36,6 +36,8 @@ const optionalArray = z.preprocess((value) => {
   return [];
 }, z.array(z.string().min(1)));
 
+const longText = (min = 0) => z.string().trim().min(min).max(10000);
+
 export const applicationSchema = z.object({
   fullName: z.string().trim().min(2).max(120),
   email: z.email().max(180),
@@ -45,26 +47,26 @@ export const applicationSchema = z.object({
   rolesInterested: splitArray,
   topRole: z.string().trim().min(2).max(160),
   secondRole: z.string().trim().max(160).optional().or(z.literal('')),
-  roleFit: z.string().trim().min(30).max(2500),
+  roleFit: longText(30),
 
   projectTitle: z.string().trim().min(2).max(160),
-  projectDescription: z.string().trim().min(30).max(3000),
+  projectDescription: longText(30),
   projectLink: z.url().max(600),
   codeLink: z.string().trim().max(600).optional().or(z.literal('')),
   toolsUsed: splitArray,
   otherTools: z.string().trim().max(300).optional().or(z.literal('')),
   soloOrTeam: z.enum(['Solo', 'Team-built']),
-  personalContribution: z.string().trim().max(2500).optional().or(z.literal('')),
-  blocker: z.string().trim().min(30).max(3000),
-  nextImprovement: z.string().trim().min(20).max(2000),
+  personalContribution: longText().optional().or(z.literal('')),
+  blocker: longText(30),
+  nextImprovement: longText(20),
 
   demoVideoLink: z.string().trim().max(600).optional().or(z.literal('')),
   resumeLink: z.string().trim().max(600).optional().or(z.literal('')),
 
-  gritEvidence: z.string().trim().min(30).max(2500),
-  presentationEvidence: z.string().trim().min(30).max(2500),
+  gritEvidence: longText(30),
+  presentationEvidence: longText(30),
   june15Availability: z.enum(['Yes', 'No, but I will submit a recorded demo', 'Not sure yet']),
-  activitiesNextYear: z.string().trim().min(10).max(2000),
+  activitiesNextYear: longText(10),
   mondayAttendance: z.enum([
     'Yes, I can attend most Monday meetings',
     'Usually, but I may have some conflicts',
@@ -75,17 +77,17 @@ export const applicationSchema = z.object({
     'Usually, but I may need to leave early sometimes',
     'No or not sure yet',
   ]),
-  attendanceConflicts: z.string().trim().max(1500).optional().or(z.literal('')),
+  attendanceConflicts: longText().optional().or(z.literal('')),
   demoAcknowledgements: optionalArray,
   leadershipExpectations: optionalArray,
-  weeklyResponsibility: z.string().trim().min(25).max(2500),
+  weeklyResponsibility: longText(25),
   summerAvailability: z.enum([
     'I can help over the summer',
     'I can help a little over the summer',
     'I cannot help much over the summer',
   ]),
   finalConfirmations: splitArray,
-  extraNotes: z.string().trim().max(2000).optional().or(z.literal('')),
+  extraNotes: longText().optional().or(z.literal('')),
 }).superRefine((data, ctx) => {
   if (data.toolsUsed.includes('Other') && !data.otherTools?.trim()) {
     ctx.addIssue({
