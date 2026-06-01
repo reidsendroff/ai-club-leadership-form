@@ -47,6 +47,7 @@ export async function ensureSchema() {
       project_link text not null,
       code_link text,
       tools_used text[] not null,
+      other_tools text,
       solo_or_team text not null,
       personal_contribution text,
       blocker text not null,
@@ -60,6 +61,10 @@ export async function ensureSchema() {
       grit_evidence text not null,
       presentation_evidence text not null,
       june15_availability text not null,
+      activities_next_year text,
+      monday_attendance text,
+      full_meeting_availability text,
+      attendance_conflicts text,
       demo_acknowledgements text[] not null,
       leadership_expectations text[] not null,
       weekly_responsibility text not null,
@@ -72,6 +77,19 @@ export async function ensureSchema() {
 
   await pool.query(`
     create index if not exists applications_created_at_idx on applications(created_at desc);
+  `);
+
+  await pool.query(`
+    alter table applications
+    add column if not exists other_tools text;
+  `);
+
+  await pool.query(`
+    alter table applications
+    add column if not exists activities_next_year text,
+    add column if not exists monday_attendance text,
+    add column if not exists full_meeting_availability text,
+    add column if not exists attendance_conflicts text;
   `);
 }
 
@@ -94,6 +112,7 @@ export async function insertApplication(data, resumeFile) {
       project_link: data.projectLink,
       code_link: data.codeLink || null,
       tools_used: data.toolsUsed,
+      other_tools: data.otherTools || null,
       solo_or_team: data.soloOrTeam,
       personal_contribution: data.personalContribution || null,
       blocker: data.blocker,
@@ -107,6 +126,10 @@ export async function insertApplication(data, resumeFile) {
       grit_evidence: data.gritEvidence,
       presentation_evidence: data.presentationEvidence,
       june15_availability: data.june15Availability,
+      activities_next_year: data.activitiesNextYear,
+      monday_attendance: data.mondayAttendance,
+      full_meeting_availability: data.fullMeetingAvailability,
+      attendance_conflicts: data.attendanceConflicts || null,
       demo_acknowledgements: data.demoAcknowledgements,
       leadership_expectations: data.leadershipExpectations,
       weekly_responsibility: data.weeklyResponsibility,
@@ -134,6 +157,7 @@ export async function insertApplication(data, resumeFile) {
     data.projectLink,
     data.codeLink || null,
     data.toolsUsed,
+    data.otherTools || null,
     data.soloOrTeam,
     data.personalContribution || null,
     data.blocker,
@@ -147,6 +171,10 @@ export async function insertApplication(data, resumeFile) {
     data.gritEvidence,
     data.presentationEvidence,
     data.june15Availability,
+    data.activitiesNextYear,
+    data.mondayAttendance,
+    data.fullMeetingAvailability,
+    data.attendanceConflicts || null,
     data.demoAcknowledgements,
     data.leadershipExpectations,
     data.weeklyResponsibility,
@@ -160,15 +188,17 @@ export async function insertApplication(data, resumeFile) {
     insert into applications (
       full_name, email, grade, contact, roles_interested, top_role, second_role,
       role_fit, project_title, project_description, project_link, code_link,
-      tools_used, solo_or_team, personal_contribution, blocker, next_improvement,
+      tools_used, other_tools, solo_or_team, personal_contribution, blocker, next_improvement,
       demo_video_link, resume_link, resume_filename, resume_mimetype, resume_size,
       resume_data, grit_evidence, presentation_evidence, june15_availability,
-      demo_acknowledgements, leadership_expectations, weekly_responsibility,
+      activities_next_year, monday_attendance, full_meeting_availability,
+      attendance_conflicts, demo_acknowledgements, leadership_expectations, weekly_responsibility,
       summer_availability, final_confirmations, extra_notes, raw_payload
     )
     values (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
-      $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33
+      $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,
+      $36,$37,$38
     )
     returning id, created_at
   `, values);
@@ -189,9 +219,10 @@ export async function listApplications() {
       id, created_at, full_name, email, grade, contact, roles_interested,
       top_role, second_role, role_fit, project_title, project_description,
       project_link, code_link, tools_used, solo_or_team, personal_contribution,
-      blocker, next_improvement, demo_video_link, resume_link, resume_filename,
+      other_tools, blocker, next_improvement, demo_video_link, resume_link, resume_filename,
       resume_mimetype, resume_size, grit_evidence, presentation_evidence,
-      june15_availability, demo_acknowledgements, leadership_expectations,
+      june15_availability, activities_next_year, monday_attendance,
+      full_meeting_availability, attendance_conflicts, demo_acknowledgements, leadership_expectations,
       weekly_responsibility, summer_availability, final_confirmations, extra_notes
     from applications
     order by created_at desc

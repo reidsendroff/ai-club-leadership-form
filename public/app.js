@@ -120,15 +120,25 @@ function updateRoleCount() {
   document.querySelector('#roleCount').textContent = selectedValues('rolesInterested').length;
 }
 
+function updateOtherToolsField() {
+  const otherSelected = selectedValues('toolsUsed').includes('Other');
+  const field = document.querySelector('#otherToolsField');
+  const input = form.elements.otherTools;
+  field.hidden = !otherSelected;
+  input.required = otherSelected;
+  if (!otherSelected) input.value = '';
+}
+
 function setStatus(message, type = '') {
   statusEl.textContent = message;
   statusEl.className = type;
 }
 
-function requireAllChecked(name, expectedCount, label) {
+function requireAllChecked(name, expectedCount, message, sectionId) {
   const count = selectedValues(name).length;
   if (count !== expectedCount) {
-    throw new Error(`Please check all ${expectedCount} ${label}.`);
+    if (sectionId) scrollToSection(sectionId);
+    throw new Error(message);
   }
 }
 
@@ -138,7 +148,11 @@ renderChecks('#demoAcks', 'demoAcknowledgements', demoAcknowledgements);
 renderChecks('#expectations', 'leadershipExpectations', leadershipExpectations);
 renderChecks('#confirmations', 'finalConfirmations', finalConfirmations);
 
-form.addEventListener('change', updateRoleCount);
+form.addEventListener('change', () => {
+  updateRoleCount();
+  updateOtherToolsField();
+});
+updateOtherToolsField();
 
 document.querySelectorAll('.jump-nav a[href^="#"]').forEach((link) => {
   link.addEventListener('click', (event) => {
@@ -159,11 +173,24 @@ form.addEventListener('submit', async (event) => {
 
   try {
     if (!form.reportValidity()) return;
-    if (!selectedValues('rolesInterested').length) throw new Error('Select at least one role.');
-    if (!selectedValues('toolsUsed').length) throw new Error('Select at least one tool used.');
-    requireAllChecked('demoAcknowledgements', demoAcknowledgements.length, 'demo acknowledgements');
-    requireAllChecked('leadershipExpectations', leadershipExpectations.length, 'leadership expectations');
-    requireAllChecked('finalConfirmations', finalConfirmations.length, 'final confirmations');
+    if (!selectedValues('rolesInterested').length) {
+      scrollToSection('#positions');
+      throw new Error('Select at least one role.');
+    }
+    if (!selectedValues('toolsUsed').length) {
+      scrollToSection('#project');
+      throw new Error('Select at least one tool used.');
+    }
+    if (selectedValues('toolsUsed').includes('Other') && !form.elements.otherTools.value.trim()) {
+      scrollToSection('#project');
+      throw new Error('Tell us what the other tool is.');
+    }
+    requireAllChecked(
+      'finalConfirmations',
+      finalConfirmations.length,
+      'Check the final confirmation boxes before submitting.',
+      '#confirm',
+    );
 
     const submitButton = form.querySelector('button[type="submit"]');
     submitButton.disabled = true;
@@ -188,6 +215,7 @@ form.addEventListener('submit', async (event) => {
 
     form.reset();
     updateRoleCount();
+    updateOtherToolsField();
     setStatus(`Submitted. Application ID: ${payload.id}. Keep building before June 15.`, 'ok');
   } catch (error) {
     setStatus(error.message, 'error');

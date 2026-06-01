@@ -38,12 +38,18 @@ loadButton.addEventListener('click', async () => {
     const resume = app.resume_filename
       ? `<a href="/api/applications/${app.id}/resume?token=${encodeURIComponent(token)}">Download resume</a>`
       : 'No resume uploaded';
+    const tools = (app.tools_used || []).join(', ');
+    const otherTools = app.other_tools ? ` (${app.other_tools})` : '';
     card.innerHTML = `
-      <h3>${escapeHtml(app.full_name)} · ${escapeHtml(app.top_role)}</h3>
-      <p><strong>Email:</strong> ${escapeHtml(app.email)} · <strong>Grade:</strong> ${escapeHtml(app.grade)}</p>
+      <h3>${escapeHtml(app.full_name)} &middot; ${escapeHtml(app.top_role)}</h3>
+      <p><strong>Email:</strong> ${escapeHtml(app.email)} &middot; <strong>Grade:</strong> ${escapeHtml(app.grade)}</p>
       <p><strong>Interested:</strong> ${escapeHtml((app.roles_interested || []).join(', '))}</p>
       <p><strong>Project:</strong> <a href="${escapeHtml(app.project_link)}">${escapeHtml(app.project_title)}</a></p>
-      <p><strong>Tools:</strong> ${escapeHtml((app.tools_used || []).join(', '))}</p>
+      <p><strong>Tools:</strong> ${escapeHtml(tools)}${escapeHtml(otherTools)}</p>
+      <p><strong>Activities next year:</strong> ${escapeHtml(app.activities_next_year)}</p>
+      <p><strong>Monday attendance:</strong> ${escapeHtml(app.monday_attendance)}</p>
+      <p><strong>Full meeting:</strong> ${escapeHtml(app.full_meeting_availability)}</p>
+      <p><strong>Known conflicts:</strong> ${escapeHtml(app.attendance_conflicts || 'None listed')}</p>
       <p><strong>Blocker:</strong> ${escapeHtml(app.blocker)}</p>
       <p><strong>Presentation:</strong> ${escapeHtml(app.presentation_evidence)}</p>
       <p>${resume}</p>
@@ -51,4 +57,3 @@ loadButton.addEventListener('click', async () => {
     list.append(card);
   }
 });
-

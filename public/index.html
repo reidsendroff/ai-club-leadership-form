@@ -122,6 +122,10 @@
             <legend>Tools used</legend>
             <div id="toolChecks" class="check-grid"></div>
           </fieldset>
+          <label class="conditional-field" id="otherToolsField" hidden>
+            What other tool did you use?
+            <input name="otherTools" maxlength="300" placeholder="Name the tool, framework, API, or platform">
+          </label>
           <div class="grid two">
             <label>
               Solo or team-built?
@@ -201,12 +205,42 @@
               </select>
             </label>
           </div>
+          <label>
+            What activities or major commitments will you be doing next year?
+            <textarea name="activitiesNextYear" minlength="10" maxlength="2000" required placeholder="Sports, clubs, jobs, tutoring, competitions, classes, family commitments, or anything else that affects your time."></textarea>
+          </label>
+          <div class="grid two">
+            <label>
+              Can you come to most Monday AI Club meetings?
+              <select name="mondayAttendance" required>
+                <option value="">Select one</option>
+                <option>Yes, I can attend most Monday meetings</option>
+                <option>Usually, but I may have some conflicts</option>
+                <option>No or not sure yet</option>
+              </select>
+            </label>
+            <label>
+              Can you stay for the full meeting time?
+              <select name="fullMeetingAvailability" required>
+                <option value="">Select one</option>
+                <option>Yes, I can usually stay the full time</option>
+                <option>Usually, but I may need to leave early sometimes</option>
+                <option>No or not sure yet</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Known Monday conflicts, optional
+            <textarea name="attendanceConflicts" maxlength="1500" placeholder="If you know a recurring conflict, say it here. If not, leave blank."></textarea>
+          </label>
           <fieldset>
             <legend>Demo acknowledgements</legend>
+            <p class="hint">Read these before submitting. They are not a hidden blocker.</p>
             <div id="demoAcks" class="check-grid"></div>
           </fieldset>
           <fieldset>
             <legend>Leadership expectations</legend>
+            <p class="hint">Check the ones you understand. Be honest if one is a concern.</p>
             <div id="expectations" class="check-grid"></div>
           </fieldset>
           <label>
