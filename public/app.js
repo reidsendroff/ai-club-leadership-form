@@ -57,8 +57,10 @@ const leadershipExpectations = [
   'I can attend at least 75% of AI Club meetings next year',
   'I can own weekly responsibilities without Reid or Ben chasing me',
   'I can respond to leadership messages within a reasonable time',
-  'I understand leadership is not honorary',
-  'I understand I may be moved out of leadership if I consistently do not perform',
+  'I understand leadership is an honor and a privilege, not a casual title',
+  'I understand leadership is extremely competitive and comes with very high expectations',
+  'I understand leadership is high-stakes for the club and not a joke in any way',
+  'I understand I may be moved out of leadership if I consistently do not meet expectations',
 ];
 
 const finalConfirmations = [
