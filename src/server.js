@@ -13,6 +13,17 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 const maxResumeMb = Number(process.env.MAX_RESUME_MB || 8);
 const adminToken = process.env.ADMIN_TOKEN;
+let schemaReady = false;
+let schemaError = null;
+const schemaReadyPromise = ensureSchema()
+  .then(() => {
+    schemaReady = true;
+    console.log('Database schema ready.');
+  })
+  .catch((error) => {
+    schemaError = error;
+    console.error('Database schema initialization failed:', error);
+  });
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -66,11 +77,17 @@ function requireAdmin(req, res, next) {
 }
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'ai-club-leadership-form' });
+  res.json({
+    ok: true,
+    service: 'ai-club-leadership-form',
+    schemaReady,
+    schemaError: schemaError ? schemaError.message : null,
+  });
 });
 
 app.post('/api/applications', upload.single('resumeFile'), async (req, res, next) => {
   try {
+    await requireSchemaReady();
     const parsed = applicationSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({
@@ -96,6 +113,7 @@ app.post('/api/applications', upload.single('resumeFile'), async (req, res, next
 
 app.get('/api/applications', requireAdmin, async (_req, res, next) => {
   try {
+    await requireSchemaReady();
     const rows = await listApplications();
     res.json({ applications: rows });
   } catch (error) {
@@ -105,6 +123,7 @@ app.get('/api/applications', requireAdmin, async (_req, res, next) => {
 
 app.get('/api/export.csv', requireAdmin, async (_req, res, next) => {
   try {
+    await requireSchemaReady();
     const rows = await listApplications();
     res.setHeader('content-type', 'text/csv; charset=utf-8');
     res.setHeader('content-disposition', 'attachment; filename="ai-club-leadership-applications.csv"');
@@ -129,6 +148,7 @@ app.get('/api/export.csv', requireAdmin, async (_req, res, next) => {
 
 app.get('/api/applications/:id/resume', requireAdmin, async (req, res, next) => {
   try {
+    await requireSchemaReady();
     const row = await getResume(req.params.id);
     if (!row?.resume_data) {
       res.status(404).json({ error: 'No resume uploaded for this application.' });
@@ -151,9 +171,15 @@ app.use((error, _req, res, _next) => {
   res.status(500).json({ error: error.message || 'Server error.' });
 });
 
-await ensureSchema();
+async function requireSchemaReady() {
+  await schemaReadyPromise;
+  if (schemaError) {
+    const error = new Error('Database is not ready. Check DATABASE_URL and Railway Postgres connection.');
+    error.cause = schemaError;
+    throw error;
+  }
+}
 
 app.listen(port, () => {
   console.log(`AI Club Leadership Form listening on port ${port}`);
 });
-
