@@ -21,7 +21,7 @@ const schemaReadyPromise = ensureSchema()
     console.log('Database schema ready.');
   })
   .catch((error) => {
-    schemaError = error;
+    schemaError = serializeError(error);
     console.error('Database schema initialization failed:', error);
   });
 
@@ -83,7 +83,7 @@ app.get('/api/health', (_req, res) => {
     storageMode,
     hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
     schemaReady,
-    schemaError: schemaError ? schemaError.message : null,
+    schemaError,
   });
 });
 
@@ -180,6 +180,18 @@ async function requireSchemaReady() {
     error.cause = schemaError;
     throw error;
   }
+}
+
+function serializeError(error) {
+  if (!error) return null;
+  return {
+    name: error.name || null,
+    message: error.message || String(error),
+    code: error.code || null,
+    detail: error.detail || null,
+    hint: error.hint || null,
+    severity: error.severity || null,
+  };
 }
 
 app.listen(port, () => {
