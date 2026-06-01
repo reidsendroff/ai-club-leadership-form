@@ -1,0 +1,29 @@
+{
+  "name": "ai-club-leadership-form",
+  "version": "1.0.0",
+  "description": "AI Club leadership application web app with Postgres-backed submissions and resume uploads.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "init-db": "node scripts/init-db.js",
+    "check": "node --check src/server.js && node --check src/db.js && node --check scripts/init-db.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fast-csv/format": "^5.0.2",
+    "compression": "^1.8.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "pg": "^8.16.3",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {}
+}
+

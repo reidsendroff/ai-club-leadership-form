@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ai_club_leadership
+    ports:
+      - "5432:5432"
+    volumes:
+      - ai_club_leadership_pg:/var/lib/postgresql/data
+
+volumes:
+  ai_club_leadership_pg:
+

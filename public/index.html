@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Club Leadership Application</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div class="kicker">Positions Open · 2026-2027</div>
+        <h1>Apply for the AI Club leadership team.</h1>
+        <p>
+          Create your best project. Submit it here. Be ready to showcase it on June 15.
+          We are looking for grit, AI/build skill, coding or vibe-coding ability, presentation skill, and role fit.
+        </p>
+        <div class="stats">
+          <span>June 13 · submission deadline</span>
+          <span>June 15 · project showcase</span>
+          <span>4 min demo + 1 min Q&A</span>
+        </div>
+      </header>
+
+      <form id="applicationForm" class="form">
+        <section class="panel">
+          <div class="section-head">
+            <span>01</span>
+            <h2>Select positions</h2>
+          </div>
+          <p class="hint">
+            Pick every role you would seriously consider. We will match people to role fit.
+          </p>
+          <div id="roleCards" class="role-grid"></div>
+          <p class="selected-count"><span id="roleCount">0</span> selected</p>
+
+          <div class="grid two">
+            <label>
+              Top choice role
+              <select name="topRole" required></select>
+            </label>
+            <label>
+              Second choice role
+              <select name="secondRole" required></select>
+            </label>
+          </div>
+          <label>
+            Why are you a fit for your top-choice role?
+            <textarea name="roleFit" minlength="30" maxlength="2500" required placeholder="Be specific. Name the work you can own every week."></textarea>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <span>02</span>
+            <h2>Applicant info</h2>
+          </div>
+          <div class="grid two">
+            <label>
+              Full name
+              <input name="fullName" required placeholder="Alex Rivera">
+            </label>
+            <label>
+              School email
+              <input name="email" type="email" required placeholder="you@school.edu">
+            </label>
+          </div>
+          <div class="grid two">
+            <label>
+              Grade next school year
+              <select name="grade" required>
+                <option value="">Select grade</option>
+                <option>9</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+              </select>
+            </label>
+            <label>
+              Discord or phone, optional
+              <input name="contact" placeholder="@username or phone">
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <span>03</span>
+            <h2>Best project submission</h2>
+          </div>
+          <p class="hint">
+            This can be an AI app, website, automation, agent, game, data project, research prototype, or anything real.
+            Free tools count. Paid tools count.
+          </p>
+          <div class="grid two">
+            <label>
+              Project title
+              <input name="projectTitle" required placeholder="AI Debate Coach">
+            </label>
+            <label>
+              Project link
+              <input name="projectLink" type="url" required placeholder="https://...">
+            </label>
+          </div>
+          <label>
+            One-paragraph project description
+            <textarea name="projectDescription" minlength="30" maxlength="3000" required placeholder="What did you build, who is it for, and what does it do?"></textarea>
+          </label>
+          <label>
+            Code or GitHub link, optional
+            <input name="codeLink" placeholder="https://github.com/...">
+          </label>
+          <fieldset>
+            <legend>Tools used</legend>
+            <div id="toolChecks" class="check-grid"></div>
+          </fieldset>
+          <div class="grid two">
+            <label>
+              Solo or team-built?
+              <select name="soloOrTeam" required>
+                <option value="">Select one</option>
+                <option>Solo</option>
+                <option>Team-built</option>
+              </select>
+            </label>
+            <label>
+              Demo video link, optional
+              <input name="demoVideoLink" placeholder="Drive, YouTube unlisted, Loom, etc.">
+            </label>
+          </div>
+          <label>
+            If team-built, what did you personally build?
+            <textarea name="personalContribution" maxlength="2500" placeholder="If solo, you can write solo. If team-built, be honest and specific."></textarea>
+          </label>
+          <label>
+            What broke, and how did you fix it?
+            <textarea name="blocker" minlength="30" maxlength="3000" required placeholder="This is one of the most important questions. We are looking for grit."></textarea>
+          </label>
+          <label>
+            What would you improve next?
+            <textarea name="nextImprovement" minlength="20" maxlength="2000" required></textarea>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <span>04</span>
+            <h2>Resume and evidence</h2>
+          </div>
+          <div class="grid two">
+            <label>
+              Resume upload
+              <input name="resumeFile" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+              <small>PDF preferred. Max size is configured on the server.</small>
+            </label>
+            <label>
+              Resume link fallback, optional
+              <input name="resumeLink" placeholder="Google Drive link if upload is blocked">
+            </label>
+          </div>
+          <label>
+            Strongest evidence that you have grit
+            <textarea name="gritEvidence" minlength="30" maxlength="2500" required placeholder="Give a real example. Generic answers are weak."></textarea>
+          </label>
+          <label>
+            Strongest evidence that you can communicate or present well
+            <textarea name="presentationEvidence" minlength="30" maxlength="2500" required placeholder="Teaching, speaking, demos, videos, writing, helping people understand something."></textarea>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <span>05</span>
+            <h2>June 15 and commitment</h2>
+          </div>
+          <div class="grid two">
+            <label>
+              Can you present live on June 15, 2026?
+              <select name="june15Availability" required>
+                <option value="">Select one</option>
+                <option>Yes</option>
+                <option>No, but I will submit a recorded demo</option>
+                <option>Not sure yet</option>
+              </select>
+            </label>
+            <label>
+              Summer availability
+              <select name="summerAvailability" required>
+                <option value="">Select one</option>
+                <option>I can help over the summer</option>
+                <option>I can help a little over the summer</option>
+                <option>I cannot help much over the summer</option>
+              </select>
+            </label>
+          </div>
+          <fieldset>
+            <legend>Demo acknowledgements</legend>
+            <div id="demoAcks" class="check-grid"></div>
+          </fieldset>
+          <fieldset>
+            <legend>Leadership expectations</legend>
+            <div id="expectations" class="check-grid"></div>
+          </fieldset>
+          <label>
+            What weekly responsibility can you realistically own?
+            <textarea name="weeklyResponsibility" minlength="25" maxlength="2500" required placeholder="Examples: attendance, announcements, team check-ins, budget tracking, Canvas updates."></textarea>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <span>06</span>
+            <h2>Final confirmations</h2>
+          </div>
+          <fieldset>
+            <legend>Confirm each statement</legend>
+            <div id="confirmations" class="check-grid"></div>
+          </fieldset>
+          <label>
+            Anything else Reid and Ben should know?
+            <textarea name="extraNotes" maxlength="2000"></textarea>
+          </label>
+        </section>
+
+        <footer class="submit-row">
+          <p id="formStatus" role="status"></p>
+          <button type="submit">Submit application</button>
+        </footer>
+      </form>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
+

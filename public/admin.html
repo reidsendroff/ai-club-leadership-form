@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Club Leadership Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div class="kicker">Admin</div>
+        <h1>Leadership applications.</h1>
+        <p>Paste the admin token to view submissions and export CSV.</p>
+      </header>
+      <section class="panel">
+        <div class="grid two">
+          <label>
+            Admin token
+            <input id="token" type="password" placeholder="ADMIN_TOKEN">
+          </label>
+          <label>
+            Actions
+            <button id="load" type="button">Load submissions</button>
+          </label>
+        </div>
+        <p id="status"></p>
+        <p><a id="csvLink" href="#">Export CSV</a></p>
+      </section>
+      <section id="list" class="admin-list"></section>
+    </main>
+    <script src="/admin.js" type="module"></script>
+  </body>
+</html>
+
