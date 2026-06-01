@@ -45,6 +45,7 @@ loadButton.addEventListener('click', async () => {
       <p><strong>Email:</strong> ${escapeHtml(app.email)} &middot; <strong>Grade:</strong> ${escapeHtml(app.grade)}</p>
       <p><strong>Interested:</strong> ${escapeHtml((app.roles_interested || []).join(', '))}</p>
       <p><strong>Project:</strong> <a href="${escapeHtml(app.project_link)}">${escapeHtml(app.project_title)}</a></p>
+      <p><strong>GitHub profile:</strong> ${app.github_profile ? `<a href="${escapeHtml(app.github_profile)}">${escapeHtml(app.github_profile)}</a>` : 'Not provided'}</p>
       <p><strong>Tools:</strong> ${escapeHtml(tools)}${escapeHtml(otherTools)}</p>
       <p><strong>Activities next year:</strong> ${escapeHtml(app.activities_next_year)}</p>
       <p><strong>Monday attendance:</strong> ${escapeHtml(app.monday_attendance)}</p>

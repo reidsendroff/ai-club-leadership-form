@@ -68,6 +68,7 @@ export async function ensureSchema() {
       next_improvement text not null,
       demo_video_link text,
       resume_link text,
+      github_profile text,
       resume_filename text,
       resume_mimetype text,
       resume_size integer,
@@ -105,6 +106,11 @@ export async function ensureSchema() {
     add column if not exists full_meeting_availability text,
     add column if not exists attendance_conflicts text;
   `);
+
+  await pool.query(`
+    alter table applications
+    add column if not exists github_profile text;
+  `);
 }
 
 export async function insertApplication(data, resumeFile) {
@@ -133,6 +139,7 @@ export async function insertApplication(data, resumeFile) {
       next_improvement: data.nextImprovement,
       demo_video_link: data.demoVideoLink || null,
       resume_link: data.resumeLink || null,
+      github_profile: data.githubProfile || null,
       resume_filename: resumeFile?.originalname || null,
       resume_mimetype: resumeFile?.mimetype || null,
       resume_size: resumeFile?.size || null,
@@ -178,6 +185,7 @@ export async function insertApplication(data, resumeFile) {
     data.nextImprovement,
     data.demoVideoLink || null,
     data.resumeLink || null,
+    data.githubProfile || null,
     resumeFile?.originalname || null,
     resumeFile?.mimetype || null,
     resumeFile?.size || null,
@@ -203,7 +211,7 @@ export async function insertApplication(data, resumeFile) {
       full_name, email, grade, contact, roles_interested, top_role, second_role,
       role_fit, project_title, project_description, project_link, code_link,
       tools_used, other_tools, solo_or_team, personal_contribution, blocker, next_improvement,
-      demo_video_link, resume_link, resume_filename, resume_mimetype, resume_size,
+      demo_video_link, resume_link, github_profile, resume_filename, resume_mimetype, resume_size,
       resume_data, grit_evidence, presentation_evidence, june15_availability,
       activities_next_year, monday_attendance, full_meeting_availability,
       attendance_conflicts, demo_acknowledgements, leadership_expectations, weekly_responsibility,
@@ -212,7 +220,7 @@ export async function insertApplication(data, resumeFile) {
     values (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
       $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,
-      $36,$37,$38
+      $36,$37,$38,$39
     )
     returning id, created_at
   `, values);
@@ -233,7 +241,7 @@ export async function listApplications() {
       id, created_at, full_name, email, grade, contact, roles_interested,
       top_role, second_role, role_fit, project_title, project_description,
       project_link, code_link, tools_used, solo_or_team, personal_contribution,
-      other_tools, blocker, next_improvement, demo_video_link, resume_link, resume_filename,
+      other_tools, blocker, next_improvement, demo_video_link, resume_link, github_profile, resume_filename,
       resume_mimetype, resume_size, grit_evidence, presentation_evidence,
       june15_availability, activities_next_year, monday_attendance,
       full_meeting_availability, attendance_conflicts, demo_acknowledgements, leadership_expectations,

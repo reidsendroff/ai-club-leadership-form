@@ -62,6 +62,7 @@ export const applicationSchema = z.object({
 
   demoVideoLink: z.string().trim().max(600).optional().or(z.literal('')),
   resumeLink: z.string().trim().max(600).optional().or(z.literal('')),
+  githubProfile: z.url().max(600).optional().or(z.literal('')),
 
   gritEvidence: longText(30),
   presentationEvidence: longText(30),
