@@ -71,6 +71,12 @@ const finalConfirmations = [
 const form = document.querySelector('#applicationForm');
 const statusEl = document.querySelector('#formStatus');
 
+function scrollToSection(id, behavior = 'smooth') {
+  const target = document.querySelector(id);
+  if (!target) return;
+  target.scrollIntoView({ behavior, block: 'start' });
+}
+
 function renderRoleCards() {
   const roleCards = document.querySelector('#roleCards');
   const topRole = form.elements.topRole;
@@ -134,6 +140,19 @@ renderChecks('#confirmations', 'finalConfirmations', finalConfirmations);
 
 form.addEventListener('change', updateRoleCount);
 
+document.querySelectorAll('.jump-nav a[href^="#"]').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    const href = link.getAttribute('href');
+    window.history.pushState(null, '', href);
+    scrollToSection(href);
+  });
+});
+
+if (window.location.hash) {
+  window.setTimeout(() => scrollToSection(window.location.hash, 'auto'), 50);
+}
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   setStatus('');
@@ -177,4 +196,3 @@ form.addEventListener('submit', async (event) => {
     submitButton.disabled = false;
   }
 });
-

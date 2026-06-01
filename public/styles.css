@@ -16,8 +16,17 @@
   box-sizing: border-box;
 }
 
+html {
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  scrollbar-color: var(--blue) #07101e;
+}
+
 body {
   margin: 0;
+  min-height: 100%;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background:
     radial-gradient(circle at 80% 0%, rgba(42, 92, 185, 0.22), transparent 32rem),
@@ -26,16 +35,36 @@ body {
     var(--bg);
   background-size: auto, 64px 64px, 64px 64px, auto;
   color: var(--text);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 14px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: #07101e;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  border: 3px solid #07101e;
+  border-radius: 999px;
+  background: var(--blue);
 }
 
 .shell {
   width: min(1120px, calc(100% - 40px));
   margin: 0 auto;
-  padding: 58px 0 90px;
+  min-height: 100vh;
+  padding: 40px 0 110px;
 }
 
 .hero {
-  padding: 28px 0 38px;
+  padding: 20px 0 30px;
 }
 
 .kicker,
@@ -49,9 +78,9 @@ legend {
 
 h1 {
   max-width: 900px;
-  margin: 52px 0 18px;
-  font-size: clamp(48px, 7vw, 92px);
-  line-height: 0.98;
+  margin: 34px 0 18px;
+  font-size: clamp(44px, 5.6vw, 78px);
+  line-height: 1;
   letter-spacing: 0;
 }
 
@@ -66,7 +95,7 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 34px;
+  margin-top: 24px;
 }
 
 .stats span,
@@ -83,14 +112,46 @@ h1 {
   font: 700 13px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
+.jump-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 8px 0;
+  background: linear-gradient(180deg, rgba(5, 10, 19, 0.96), rgba(5, 10, 19, 0.78));
+  backdrop-filter: blur(12px);
+}
+
+.jump-nav a {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(8, 16, 31, 0.88);
+  color: var(--blue);
+  font: 800 12px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.08em;
+  padding: 10px 12px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.jump-nav a:focus,
+.jump-nav a:hover {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
 .form {
   display: grid;
-  gap: 22px;
+  gap: 18px;
 }
 
 .panel {
   border-radius: 10px;
-  padding: 28px;
+  padding: 24px;
+  scroll-margin-top: 70px;
 }
 
 .section-head {
@@ -124,7 +185,7 @@ small {
 label {
   display: grid;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 14px;
   color: var(--blue);
   font: 700 12px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
   letter-spacing: 0.16em;
@@ -160,7 +221,7 @@ textarea:focus {
 fieldset {
   border: 0;
   padding: 0;
-  margin: 26px 0 0;
+  margin: 20px 0 0;
 }
 
 .role-grid,
@@ -177,7 +238,7 @@ fieldset {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #091222;
-  padding: 18px;
+  padding: 16px;
   cursor: pointer;
 }
 
@@ -279,15 +340,26 @@ button:disabled {
 
   .shell {
     width: min(100% - 28px, 1120px);
-    padding-top: 28px;
+    padding-top: 24px;
+    padding-bottom: 96px;
   }
 
   .panel {
-    padding: 20px;
+    padding: 18px;
   }
 
   h1 {
-    font-size: 48px;
+    font-size: 42px;
+  }
+
+  .jump-nav {
+    gap: 6px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .jump-nav a {
+    font-size: 11px;
+    padding: 9px 10px;
   }
 }
-
