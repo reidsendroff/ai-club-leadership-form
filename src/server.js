@@ -6,7 +6,7 @@ import compression from 'compression';
 import multer from 'multer';
 import { format } from '@fast-csv/format';
 
-import { ensureSchema, getResume, insertApplication, listApplications } from './db.js';
+import { ensureSchema, getResume, insertApplication, listApplications, storageMode } from './db.js';
 import { applicationSchema } from './validation.js';
 
 const app = express();
@@ -80,6 +80,8 @@ app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
     service: 'ai-club-leadership-form',
+    storageMode,
+    hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
     schemaReady,
     schemaError: schemaError ? schemaError.message : null,
   });

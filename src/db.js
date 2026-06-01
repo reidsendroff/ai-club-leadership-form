@@ -6,20 +6,31 @@ import path from 'node:path';
 const { Pool } = pg;
 
 const databaseUrl = process.env.DATABASE_URL;
-const useLocalJson = !databaseUrl;
+const isHosted = Boolean(
+  process.env.RAILWAY_ENVIRONMENT
+  || process.env.RAILWAY_ENVIRONMENT_ID
+  || process.env.RAILWAY_PROJECT_ID
+  || process.env.NODE_ENV === 'production',
+);
+export const storageMode = databaseUrl ? 'postgres' : 'local-json';
+const useLocalJson = !databaseUrl && !isHosted;
 const dataDir = path.resolve('data');
 const localStore = path.join(dataDir, 'applications.json');
 
-if (!databaseUrl) {
+if (!databaseUrl && useLocalJson) {
   console.warn('DATABASE_URL is not set. Using local JSON storage for development.');
+} else if (!databaseUrl) {
+  console.error('DATABASE_URL is not set. Hosted deployments must connect to Postgres.');
 }
 
-export const pool = new Pool({
-  connectionString: databaseUrl,
-  ssl: databaseUrl?.includes('railway') || databaseUrl?.includes('render') || databaseUrl?.includes('neon')
-    ? { rejectUnauthorized: false }
-    : undefined,
-});
+export const pool = databaseUrl
+  ? new Pool({
+      connectionString: databaseUrl,
+      ssl: databaseUrl.includes('railway') || databaseUrl.includes('render') || databaseUrl.includes('neon')
+        ? { rejectUnauthorized: false }
+        : undefined,
+    })
+  : null;
 
 export async function ensureSchema() {
   if (useLocalJson) {
@@ -28,6 +39,9 @@ export async function ensureSchema() {
       await writeFile(localStore, '[]\n', 'utf8');
     }
     return;
+  }
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is missing. Add the Railway Postgres DATABASE_URL variable to the web service.');
   }
 
   await pool.query(`
