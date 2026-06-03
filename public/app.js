@@ -48,35 +48,65 @@ const tools = [
 ];
 
 const demoAcknowledgements = [
-  'Up to 5 minutes total: 4-minute demo + 1-minute Q&A',
-  'If many people apply, the format may switch to shorter lightning demos',
-  'I should show the real project, not just talk about it',
+  'I understand the June 15 format: up to 5 minutes total, usually a 4-minute demo and 1-minute Q&A. If many people apply, demos may become shorter lightning demos. I should show the real project or prototype, not only describe the idea.',
 ];
 
 const leadershipExpectations = [
-  'I can attend at least 75% of AI Club meetings next year',
-  'I can own weekly responsibilities without Reid or Ben chasing me',
-  'I can respond to leadership messages within a reasonable time',
-  'I understand leadership is an honor and a privilege, not a casual title',
-  'I understand leadership is extremely competitive and comes with very high expectations',
-  'I understand leadership is high-stakes for the club and not a joke in any way',
-  'I understand I may be moved out of leadership if I consistently do not meet expectations',
+  'I can attend most Monday AI Club meetings next year and stay for the full meeting when possible',
+  'I can own a weekly responsibility without Reid or Ben repeatedly reminding me',
+  'I can respond to leadership messages and blockers in a reasonable amount of time',
+  'I understand leadership is a working role, not just a title for a resume',
+  'I am willing to use AI tools, GitHub, documentation, and automation to help the club run better',
+  'I can ask for help early if I am falling behind instead of disappearing',
+  'I understand role assignments may change if my availability or follow-through does not match the responsibility',
 ];
 
 const finalConfirmations = [
-  'I represented my project honestly',
-  'I disclosed team help or outside help where relevant',
-  'I give AI Club permission to discuss or showcase my project internally',
-  'I understand Reid and Ben will use this form plus the June 15 demo to make leadership decisions',
+  'The project links and descriptions I submitted are accurate',
+  'If I worked with teammates or used outside help, I explained my own contribution clearly',
+  'AI Club may review or discuss my submitted project internally as part of leadership selection',
+  'I understand Reid and Ben will use this application, my project evidence, and the June 15 demo or presentation to make leadership decisions',
 ];
 
 const form = document.querySelector('#applicationForm');
 const statusEl = document.querySelector('#formStatus');
+const draftStatusEl = document.querySelector('#draftStatus');
+const prevButton = document.querySelector('#prevStep');
+const nextButton = document.querySelector('#nextStep');
+const submitButton = document.querySelector('#submitApplication');
+const panels = Array.from(form.querySelectorAll('.panel'));
+const stepIds = panels.map((panel) => panel.id);
+const draftKey = 'aiClubLeadershipApplicationDraft:v3';
+let currentStep = Math.max(0, stepIds.indexOf(window.location.hash.replace('#', '')));
+let saveTimer;
 
 function scrollToSection(id, behavior = 'smooth') {
   const target = document.querySelector(id);
   if (!target) return;
   target.scrollIntoView({ behavior, block: 'start' });
+}
+
+function showStep(index, behavior = 'smooth') {
+  currentStep = Math.min(Math.max(index, 0), panels.length - 1);
+  panels.forEach((panel, panelIndex) => {
+    panel.hidden = panelIndex !== currentStep;
+  });
+
+  document.querySelectorAll('[data-step-link]').forEach((link) => {
+    const isActive = link.dataset.stepLink === stepIds[currentStep];
+    link.classList.toggle('active', isActive);
+    link.setAttribute('aria-current', isActive ? 'step' : 'false');
+  });
+
+  prevButton.disabled = currentStep === 0;
+  nextButton.hidden = currentStep === panels.length - 1;
+  submitButton.hidden = currentStep !== panels.length - 1;
+
+  const hash = `#${stepIds[currentStep]}`;
+  if (window.location.hash !== hash) {
+    window.history.replaceState(null, '', hash);
+  }
+  scrollToSection(hash, behavior);
 }
 
 function renderRoleCards() {
@@ -131,6 +161,10 @@ function updateOtherToolsField() {
   if (!otherSelected) input.value = '';
 }
 
+function setDraftStatus(message) {
+  draftStatusEl.textContent = message;
+}
+
 function setStatus(message, type = '') {
   statusEl.className = type;
   statusEl.replaceChildren();
@@ -155,57 +189,154 @@ function requireAllChecked(name, expectedCount, message, sectionId) {
   }
 }
 
+function serializeDraft() {
+  const draft = {};
+  Array.from(form.elements).forEach((element) => {
+    if (!element.name || element.type === 'file') return;
+    if (element.type === 'checkbox') {
+      draft[element.name] ??= [];
+      if (element.checked) draft[element.name].push(element.value);
+      return;
+    }
+    draft[element.name] = element.value;
+  });
+  return draft;
+}
+
+function saveDraft() {
+  window.localStorage.setItem(draftKey, JSON.stringify(serializeDraft()));
+  setDraftStatus('Draft saved locally in this browser.');
+}
+
+function queueDraftSave() {
+  setDraftStatus('Saving draft...');
+  window.clearTimeout(saveTimer);
+  saveTimer = window.setTimeout(saveDraft, 250);
+}
+
+function restoreDraft() {
+  const raw = window.localStorage.getItem(draftKey);
+  if (!raw) return;
+
+  try {
+    const draft = JSON.parse(raw);
+    Object.entries(draft).forEach(([name, value]) => {
+      const field = form.elements[name];
+      if (!field) return;
+      const normalized = typeof field.length === 'number' && !field.type ? Array.from(field) : [field];
+      normalized.filter(Boolean).forEach((element) => {
+        if (element.type === 'checkbox') {
+          element.checked = Array.isArray(value) && value.includes(element.value);
+          return;
+        }
+        if (element.type !== 'file') element.value = value ?? '';
+      });
+    });
+    setDraftStatus('Draft restored from this browser.');
+  } catch {
+    setDraftStatus('Draft autosave is available.');
+  }
+}
+
+function validatePanel(panel) {
+  const controls = Array.from(panel.querySelectorAll('input, select, textarea'));
+  const invalid = controls.find((control) => !control.checkValidity());
+  if (invalid) {
+    invalid.reportValidity();
+    return false;
+  }
+
+  if (panel.id === 'positions' && !selectedValues('rolesInterested').length) {
+    setStatus('Select at least one role.', 'error');
+    return false;
+  }
+  if (panel.id === 'project' && !selectedValues('toolsUsed').length) {
+    setStatus('Select at least one tool used.', 'error');
+    return false;
+  }
+  if (panel.id === 'project' && selectedValues('toolsUsed').includes('Other') && !form.elements.otherTools.value.trim()) {
+    setStatus('Tell us what the other tool is.', 'error');
+    return false;
+  }
+  return true;
+}
+
+function findFirstInvalidStep() {
+  for (let index = 0; index < panels.length; index += 1) {
+    if (!validatePanel(panels[index])) return index;
+  }
+  if (selectedValues('demoAcknowledgements').length !== demoAcknowledgements.length) {
+    setStatus('Confirm the June 15 demo format before submitting.', 'error');
+    return stepIds.indexOf('commitment');
+  }
+  if (selectedValues('leadershipExpectations').length !== leadershipExpectations.length) {
+    setStatus('Check every leadership expectation only if you can honestly agree to it.', 'error');
+    return stepIds.indexOf('commitment');
+  }
+  if (selectedValues('finalConfirmations').length !== finalConfirmations.length) {
+    setStatus('Complete the final confirmation checkboxes before submitting.', 'error');
+    return stepIds.indexOf('confirm');
+  }
+  return -1;
+}
+
 renderRoleCards();
 renderChecks('#toolChecks', 'toolsUsed', tools);
 renderChecks('#demoAcks', 'demoAcknowledgements', demoAcknowledgements);
 renderChecks('#expectations', 'leadershipExpectations', leadershipExpectations);
 renderChecks('#confirmations', 'finalConfirmations', finalConfirmations);
+restoreDraft();
+updateRoleCount();
+updateOtherToolsField();
+showStep(currentStep, 'auto');
 
 form.addEventListener('change', () => {
   updateRoleCount();
   updateOtherToolsField();
+  queueDraftSave();
 });
-updateOtherToolsField();
+
+form.addEventListener('input', queueDraftSave);
 
 document.querySelectorAll('.jump-nav a[href^="#"]').forEach((link) => {
   link.addEventListener('click', (event) => {
     event.preventDefault();
-    const href = link.getAttribute('href');
-    window.history.pushState(null, '', href);
-    scrollToSection(href);
+    const stepIndex = stepIds.indexOf(link.dataset.stepLink);
+    if (stepIndex >= 0) showStep(stepIndex);
   });
 });
 
-if (window.location.hash) {
-  window.setTimeout(() => scrollToSection(window.location.hash, 'auto'), 50);
-}
+prevButton.addEventListener('click', () => {
+  setStatus('');
+  showStep(currentStep - 1);
+});
+
+nextButton.addEventListener('click', () => {
+  setStatus('');
+  if (!validatePanel(panels[currentStep])) return;
+  saveDraft();
+  showStep(currentStep + 1);
+});
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   setStatus('');
 
   try {
-    if (!form.reportValidity()) return;
-    if (!selectedValues('rolesInterested').length) {
-      scrollToSection('#positions');
-      throw new Error('Select at least one role.');
+    const invalidStep = findFirstInvalidStep();
+    if (invalidStep >= 0) {
+      showStep(invalidStep);
+      return;
     }
-    if (!selectedValues('toolsUsed').length) {
-      scrollToSection('#project');
-      throw new Error('Select at least one tool used.');
-    }
-    if (selectedValues('toolsUsed').includes('Other') && !form.elements.otherTools.value.trim()) {
-      scrollToSection('#project');
-      throw new Error('Tell us what the other tool is.');
-    }
+    requireAllChecked('demoAcknowledgements', demoAcknowledgements.length, 'Confirm the June 15 demo format before submitting.', '#commitment');
     requireAllChecked(
-      'finalConfirmations',
-      finalConfirmations.length,
-      'Check the final confirmation boxes before submitting.',
-      '#confirm',
+      'leadershipExpectations',
+      leadershipExpectations.length,
+      'Check every leadership expectation only if you can honestly agree to it.',
+      '#commitment',
     );
+    requireAllChecked('finalConfirmations', finalConfirmations.length, 'Complete the final confirmation checkboxes before submitting.', '#confirm');
 
-    const submitButton = form.querySelector('button[type="submit"]');
     submitButton.disabled = true;
     setStatus('Submitting...');
 
@@ -230,13 +361,15 @@ form.addEventListener('submit', async (event) => {
     }
 
     form.reset();
+    window.localStorage.removeItem(draftKey);
     updateRoleCount();
     updateOtherToolsField();
+    showStep(0);
     setStatus(`Submitted. Application ID: ${payload.id}. Keep building before June 15.`, 'ok');
+    setDraftStatus('Draft cleared after submission.');
   } catch (error) {
     setStatus(error.message, 'error');
   } finally {
-    const submitButton = form.querySelector('button[type="submit"]');
     submitButton.disabled = false;
   }
 });

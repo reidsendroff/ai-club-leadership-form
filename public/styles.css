@@ -138,9 +138,18 @@ h1 {
 }
 
 .jump-nav a:focus,
-.jump-nav a:hover {
+.jump-nav a:hover,
+.jump-nav a.active {
   border-color: var(--blue);
   color: var(--text);
+}
+
+.draft-status {
+  color: var(--ok);
+  font: 700 12px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.12em;
+  margin: 14px 0 0;
+  text-transform: uppercase;
 }
 
 .form {
@@ -152,6 +161,11 @@ h1 {
   border-radius: 10px;
   padding: 24px;
   scroll-margin-top: 70px;
+}
+
+.panel[hidden],
+button[hidden] {
+  display: none !important;
 }
 
 .section-head {
@@ -284,6 +298,13 @@ fieldset {
   margin-top: 16px;
 }
 
+.nav-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: max-content;
+}
+
 button {
   border: 0;
   border-radius: 9px;
@@ -292,6 +313,12 @@ button {
   font-weight: 800;
   padding: 16px 22px;
   cursor: pointer;
+}
+
+button.secondary {
+  border: 1px solid var(--line);
+  background: rgba(8, 16, 31, 0.88);
+  color: var(--text);
 }
 
 button:disabled {
@@ -371,5 +398,19 @@ button:disabled {
   .jump-nav a {
     font-size: 11px;
     padding: 9px 10px;
+  }
+
+  .submit-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .nav-actions {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .nav-actions button {
+    flex: 1;
   }
 }

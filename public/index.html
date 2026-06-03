@@ -20,13 +20,14 @@
           <span>June 15 &middot; project showcase</span>
           <span>4 min demo + 1 min Q&A</span>
         </div>
-        <nav class="jump-nav" aria-label="Form sections">
-          <a href="#positions">Positions</a>
-          <a href="#applicant-info">Info</a>
-          <a href="#project">Project</a>
-          <a href="#resume">Resume</a>
-          <a href="#commitment">Commitment</a>
-          <a href="#confirm">Submit</a>
+        <p id="draftStatus" class="draft-status" role="status">Draft saves locally as you work.</p>
+        <nav class="jump-nav" aria-label="Form steps">
+          <a href="#positions" data-step-link="positions">Positions</a>
+          <a href="#applicant-info" data-step-link="applicant-info">Info</a>
+          <a href="#project" data-step-link="project">Project</a>
+          <a href="#resume" data-step-link="resume">Resume</a>
+          <a href="#commitment" data-step-link="commitment">Readiness</a>
+          <a href="#confirm" data-step-link="confirm">Submit</a>
         </nav>
       </header>
 
@@ -240,12 +241,17 @@
           </label>
           <fieldset>
             <legend>Demo acknowledgements</legend>
-            <p class="hint">Read these before submitting. They are not a hidden blocker.</p>
+            <p class="hint">
+              Read this before submitting. Check the box to confirm you understand the June 15 demo format.
+            </p>
             <div id="demoAcks" class="check-grid"></div>
           </fieldset>
           <fieldset>
             <legend>Leadership expectations</legend>
-            <p class="hint">Check the ones you understand. Be honest if one is a concern.</p>
+            <p class="hint">
+              These are baseline expectations for leadership. Check each statement only if you can honestly agree to it.
+              If one is not true for you right now, pause before submitting.
+            </p>
             <div id="expectations" class="check-grid"></div>
           </fieldset>
           <label>
@@ -260,7 +266,7 @@
             <h2>Final confirmations</h2>
           </div>
           <fieldset>
-            <legend>Confirm each statement</legend>
+            <legend>Before you submit</legend>
             <div id="confirmations" class="check-grid"></div>
           </fieldset>
           <label>
@@ -271,7 +277,11 @@
 
         <footer class="submit-row">
           <p id="formStatus" role="status"></p>
-          <button type="submit">Submit application</button>
+          <div class="nav-actions">
+            <button type="button" id="prevStep" class="secondary">Back</button>
+            <button type="button" id="nextStep">Save and continue</button>
+            <button type="submit" id="submitApplication">Submit application</button>
+          </div>
         </footer>
       </form>
     </main>
