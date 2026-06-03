@@ -56,6 +56,30 @@ Replace `YOUR_TOKEN` with `ADMIN_TOKEN`.
 /api/applications/:id/resume?token=YOUR_TOKEN
 ```
 
+## Ranking Leadership Candidates
+
+`RankLeadershipCandidates.py` queries the applications database, asks the
+available model CLIs (`claude`, `gemini`, and `codex`) for independent reviews,
+then writes a consensus ranking to `data/rankings/`.
+
+Add your Railway Postgres URL to local `.env` first. `.env` is gitignored, so do
+not paste live credentials into tracked files.
+
+```powershell
+$env:DATABASE_URL="postgresql://..."
+python .\RankLeadershipCandidates.py
+```
+
+Useful variants:
+
+```powershell
+python .\RankLeadershipCandidates.py --fetch-only
+python .\RankLeadershipCandidates.py --models claude,gemini --timeout 240
+python .\RankLeadershipCandidates.py --limit 25
+```
+
+The ranking is advisory. Reid and Ben make the final leadership decisions.
+
 ## Google Forms Backup
 
 If school policy requires a native Google Form, use:
@@ -65,4 +89,3 @@ google_forms/AI_Club_Leadership_Form_Generator.js
 ```
 
 Paste it into Apps Script and run `createAIClubLeadershipApplication`.
-
