@@ -181,12 +181,36 @@ function setStatus(message, type = '') {
   statusEl.textContent = message;
 }
 
-function requireAllChecked(name, expectedCount, message, sectionId) {
-  const count = selectedValues(name).length;
-  if (count !== expectedCount) {
-    if (sectionId) scrollToSection(sectionId);
-    throw new Error(message);
-  }
+function notifySubmitProblem(message, stepIndex = currentStep) {
+  setStatus(message, 'error');
+  showStep(stepIndex);
+  statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function friendlyFieldName(path) {
+  const labels = {
+    fullName: 'Full name',
+    email: 'School email',
+    grade: 'Grade',
+    rolesInterested: 'Role interests',
+    topRole: 'Top choice role',
+    projectTitle: 'Project title',
+    projectLink: 'Project link',
+    codeLink: 'Public GitHub/code link',
+    toolsUsed: 'Tools used',
+    soloOrTeam: 'Solo or team-built',
+    githubProfile: 'GitHub profile link',
+    june15Availability: 'June 15 availability',
+    mondayAttendance: 'Monday attendance',
+    fullMeetingAvailability: 'Full meeting availability',
+    summerAvailability: 'Summer availability',
+    otherTools: 'Other tools',
+  };
+  return labels[path] || path || 'Application';
+}
+
+function issueMessage(issue) {
+  return `${friendlyFieldName(issue.path)}: ${issue.message}`;
 }
 
 function serializeDraft() {
@@ -258,24 +282,32 @@ function validatePanel(panel) {
     setStatus('Tell us what the other tool is.', 'error');
     return false;
   }
+  if (panel.id === 'project' && form.elements.codeLink.value.trim()) {
+    const githubRepoPattern = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/?$/;
+    if (!githubRepoPattern.test(form.elements.codeLink.value.trim())) {
+      form.elements.codeLink.setCustomValidity('Use a full GitHub repo URL like https://github.com/username/project.');
+      setStatus('GitHub repo links must look like https://github.com/username/project.', 'error');
+      form.elements.codeLink.reportValidity();
+      return false;
+    }
+    form.elements.codeLink.setCustomValidity('');
+  }
+  if (panel.id === 'resume' && form.elements.githubProfile.value.trim()) {
+    const githubProfilePattern = /^https:\/\/github\.com\/[^/\s]+\/?$/;
+    if (!githubProfilePattern.test(form.elements.githubProfile.value.trim())) {
+      form.elements.githubProfile.setCustomValidity('Use a GitHub profile URL like https://github.com/username.');
+      setStatus('GitHub profile links must look like https://github.com/username.', 'error');
+      form.elements.githubProfile.reportValidity();
+      return false;
+    }
+    form.elements.githubProfile.setCustomValidity('');
+  }
   return true;
 }
 
 function findFirstInvalidStep() {
   for (let index = 0; index < panels.length; index += 1) {
     if (!validatePanel(panels[index])) return index;
-  }
-  if (selectedValues('demoAcknowledgements').length !== demoAcknowledgements.length) {
-    setStatus('Confirm the June 15 demo format before submitting.', 'error');
-    return stepIds.indexOf('commitment');
-  }
-  if (selectedValues('leadershipExpectations').length !== leadershipExpectations.length) {
-    setStatus('Check every leadership expectation only if you can honestly agree to it.', 'error');
-    return stepIds.indexOf('commitment');
-  }
-  if (selectedValues('finalConfirmations').length !== finalConfirmations.length) {
-    setStatus('Complete the final confirmation checkboxes before submitting.', 'error');
-    return stepIds.indexOf('confirm');
   }
   return -1;
 }
@@ -297,6 +329,12 @@ form.addEventListener('change', () => {
 });
 
 form.addEventListener('input', queueDraftSave);
+
+for (const fieldName of ['codeLink', 'githubProfile']) {
+  form.elements[fieldName]?.addEventListener('input', (event) => {
+    event.currentTarget.setCustomValidity('');
+  });
+}
 
 document.querySelectorAll('.jump-nav a[href^="#"]').forEach((link) => {
   link.addEventListener('click', (event) => {
@@ -325,17 +363,9 @@ form.addEventListener('submit', async (event) => {
   try {
     const invalidStep = findFirstInvalidStep();
     if (invalidStep >= 0) {
-      showStep(invalidStep);
+      notifySubmitProblem('Please fix the highlighted baseline field, then submit again.', invalidStep);
       return;
     }
-    requireAllChecked('demoAcknowledgements', demoAcknowledgements.length, 'Confirm the June 15 demo format before submitting.', '#commitment');
-    requireAllChecked(
-      'leadershipExpectations',
-      leadershipExpectations.length,
-      'Check every leadership expectation only if you can honestly agree to it.',
-      '#commitment',
-    );
-    requireAllChecked('finalConfirmations', finalConfirmations.length, 'Complete the final confirmation checkboxes before submitting.', '#confirm');
 
     submitButton.disabled = true;
     setStatus('Submitting...');
@@ -354,7 +384,8 @@ form.addEventListener('submit', async (event) => {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
       if (payload.issues?.length) {
-        setStatus(payload.issues.map((issue) => `${issue.path}: ${issue.message}`), 'error');
+        setStatus(payload.issues.map(issueMessage), 'error');
+        statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
       throw new Error(payload.error || 'Submission failed.');
@@ -369,6 +400,7 @@ form.addEventListener('submit', async (event) => {
     setDraftStatus('Draft cleared after submission.');
   } catch (error) {
     setStatus(error.message, 'error');
+    statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   } finally {
     submitButton.disabled = false;
   }

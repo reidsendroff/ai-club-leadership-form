@@ -55,7 +55,7 @@
           </div>
           <label>
             Why are you a fit for your top-choice role?
-            <textarea name="roleFit" minlength="30" maxlength="10000" required placeholder="Be specific. Name the work you can own every week."></textarea>
+            <textarea name="roleFit" maxlength="10000" placeholder="Be specific if you can. Name the work you can own every week."></textarea>
           </label>
         </section>
 
@@ -113,11 +113,12 @@
           </div>
           <label>
             One-paragraph project description
-            <textarea name="projectDescription" minlength="30" maxlength="10000" required placeholder="What did you build, who is it for, and what does it do?"></textarea>
+            <textarea name="projectDescription" maxlength="10000" placeholder="What did you build, who is it for, and what does it do?"></textarea>
           </label>
           <label>
             Public GitHub or code link, optional
-            <input name="codeLink" placeholder="Public GitHub repo or public code link">
+            <input name="codeLink" pattern="https://github\.com/[^/\s]+/[^/\s]+/?" placeholder="https://github.com/username/project">
+            <small>If you include a GitHub repo, use the full repo URL.</small>
           </label>
           <fieldset>
             <legend>Tools used</legend>
@@ -147,11 +148,11 @@
           </label>
           <label>
             What broke, and how did you fix it?
-            <textarea name="blocker" minlength="30" maxlength="10000" required placeholder="This is one of the most important questions. We are looking for grit."></textarea>
+            <textarea name="blocker" maxlength="10000" placeholder="This is one of the most important questions. Short is okay."></textarea>
           </label>
           <label>
             What would you improve next?
-            <textarea name="nextImprovement" minlength="20" maxlength="10000" required></textarea>
+            <textarea name="nextImprovement" maxlength="10000"></textarea>
           </label>
         </section>
 
@@ -173,16 +174,16 @@
           </div>
           <label>
             GitHub profile link, optional
-            <input name="githubProfile" type="url" maxlength="600" placeholder="https://github.com/your-username">
+            <input name="githubProfile" maxlength="600" pattern="https://github\.com/[^/\s]+/?" placeholder="https://github.com/your-username">
             <small>Share this so Reid and Ben can see impressive projects you have built before, not just the one project you submit here.</small>
           </label>
           <label>
             Strongest evidence that you have grit
-            <textarea name="gritEvidence" minlength="30" maxlength="10000" required placeholder="Give a real example. Generic answers are weak."></textarea>
+            <textarea name="gritEvidence" maxlength="10000" placeholder="Give a real example if you can. Short is okay."></textarea>
           </label>
           <label>
             Strongest evidence that you can communicate or present well
-            <textarea name="presentationEvidence" minlength="30" maxlength="10000" required placeholder="Teaching, speaking, demos, videos, writing, helping people understand something."></textarea>
+            <textarea name="presentationEvidence" maxlength="10000" placeholder="Teaching, speaking, demos, videos, writing, helping people understand something."></textarea>
           </label>
         </section>
 
@@ -213,7 +214,7 @@
           </div>
           <label>
             What activities or major commitments will you be doing next year?
-            <textarea name="activitiesNextYear" minlength="10" maxlength="10000" required placeholder="Sports, clubs, jobs, tutoring, competitions, classes, family commitments, or anything else that affects your time."></textarea>
+            <textarea name="activitiesNextYear" maxlength="10000" placeholder="Sports, clubs, jobs, tutoring, competitions, classes, family commitments, or anything else that affects your time."></textarea>
           </label>
           <div class="grid two">
             <label>
@@ -249,14 +250,14 @@
           <fieldset>
             <legend>Leadership expectations</legend>
             <p class="hint">
-              These are baseline expectations for leadership. Check each statement only if you can honestly agree to it.
-              If one is not true for you right now, pause before submitting.
+              These are baseline expectations for leadership. Check the statements you can honestly agree to.
+              Leaving one unchecked will not block submission.
             </p>
             <div id="expectations" class="check-grid"></div>
           </fieldset>
           <label>
             What weekly responsibility can you realistically own?
-            <textarea name="weeklyResponsibility" minlength="25" maxlength="10000" required placeholder="Examples: attendance, announcements, team check-ins, budget tracking, Canvas updates."></textarea>
+            <textarea name="weeklyResponsibility" maxlength="10000" placeholder="Examples: attendance, announcements, team check-ins, budget tracking, Canvas updates."></textarea>
           </label>
         </section>
 

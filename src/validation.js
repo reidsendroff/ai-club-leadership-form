@@ -36,7 +36,27 @@ const optionalArray = z.preprocess((value) => {
   return [];
 }, z.array(z.string().min(1)));
 
-const longText = (min = 0) => z.string().trim().min(min).max(10000);
+const textField = (min = 0) => z.string().trim().min(min).max(10000);
+const optionalText = z.string().trim().max(10000).optional().or(z.literal(''));
+const optionalUrl = z.string().trim().max(600).refine((value) => {
+  if (!value) return true;
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}, 'Must be a valid URL.').optional().or(z.literal(''));
+
+const githubRepoUrl = z.string().trim().max(600).refine((value) => {
+  if (!value) return true;
+  return /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/?$/.test(value);
+}, 'GitHub repo links must look like https://github.com/username/project.');
+
+const githubProfileUrl = z.string().trim().max(600).refine((value) => {
+  if (!value) return true;
+  return /^https:\/\/github\.com\/[^/\s]+\/?$/.test(value);
+}, 'GitHub profile links must look like https://github.com/username.');
 
 export const applicationSchema = z.object({
   fullName: z.string().trim().min(2).max(120),
@@ -47,27 +67,27 @@ export const applicationSchema = z.object({
   rolesInterested: splitArray,
   topRole: z.string().trim().min(2).max(160),
   secondRole: z.string().trim().max(160).optional().or(z.literal('')),
-  roleFit: longText(30),
+  roleFit: textField().optional().or(z.literal('')),
 
   projectTitle: z.string().trim().min(2).max(160),
-  projectDescription: longText(30),
+  projectDescription: textField().optional().or(z.literal('')),
   projectLink: z.url().max(600),
-  codeLink: z.string().trim().max(600).optional().or(z.literal('')),
+  codeLink: githubRepoUrl.optional().or(z.literal('')),
   toolsUsed: splitArray,
   otherTools: z.string().trim().max(300).optional().or(z.literal('')),
   soloOrTeam: z.enum(['Solo', 'Team-built']),
-  personalContribution: longText().optional().or(z.literal('')),
-  blocker: longText(30),
-  nextImprovement: longText(20),
+  personalContribution: optionalText,
+  blocker: textField().optional().or(z.literal('')),
+  nextImprovement: textField().optional().or(z.literal('')),
 
-  demoVideoLink: z.string().trim().max(600).optional().or(z.literal('')),
-  resumeLink: z.string().trim().max(600).optional().or(z.literal('')),
-  githubProfile: z.url().max(600).optional().or(z.literal('')),
+  demoVideoLink: optionalUrl,
+  resumeLink: optionalUrl,
+  githubProfile: githubProfileUrl.optional().or(z.literal('')),
 
-  gritEvidence: longText(30),
-  presentationEvidence: longText(30),
+  gritEvidence: textField().optional().or(z.literal('')),
+  presentationEvidence: textField().optional().or(z.literal('')),
   june15Availability: z.enum(['Yes', 'No, but I will submit a recorded demo', 'Not sure yet']),
-  activitiesNextYear: longText(10),
+  activitiesNextYear: textField().optional().or(z.literal('')),
   mondayAttendance: z.enum([
     'Yes, I can attend most Monday meetings',
     'Usually, but I may have some conflicts',
@@ -78,17 +98,17 @@ export const applicationSchema = z.object({
     'Usually, but I may need to leave early sometimes',
     'No or not sure yet',
   ]),
-  attendanceConflicts: longText().optional().or(z.literal('')),
+  attendanceConflicts: optionalText,
   demoAcknowledgements: optionalArray,
   leadershipExpectations: optionalArray,
-  weeklyResponsibility: longText(25),
+  weeklyResponsibility: textField().optional().or(z.literal('')),
   summerAvailability: z.enum([
     'I can help over the summer',
     'I can help a little over the summer',
     'I cannot help much over the summer',
   ]),
-  finalConfirmations: splitArray,
-  extraNotes: longText().optional().or(z.literal('')),
+  finalConfirmations: optionalArray,
+  extraNotes: optionalText,
 }).superRefine((data, ctx) => {
   if (data.toolsUsed.includes('Other') && !data.otherTools?.trim()) {
     ctx.addIssue({
